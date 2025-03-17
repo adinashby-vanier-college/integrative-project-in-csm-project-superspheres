@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox fx:id="vboxRootNode" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="20.0" style="-fx-background-image: url('SpaceBackground.jpg'); -fx-background-size: cover;" xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="labelTitle" contentDisplay="CENTER" lineSpacing="2.0" prefHeight="72.0" prefWidth="251.0" style="-fx-font-family: 'Dubai Medium'; -fx-font-size: 40; -fx-font-weight: Bold;" text="Super Spheres">
+         <font>
+            <Font name="Dubai Medium" size="12.0" />
+         </font>
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.5230247974395752" green="0.4099999964237213" blue="1.0" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill></Label>
+      <Button fx:id="buttonStart" lineSpacing="2.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="87.0" scaleX="1.1" scaleY="1.1" style="-fx-background-color: #333333; -fx-background-radius: 10;" text="START" textFill="WHITE">
+         <font>
+            <Font name="Dubai Bold" size="15.0" />
+         </font>
+      </Button>
+   </children>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+</VBox>
