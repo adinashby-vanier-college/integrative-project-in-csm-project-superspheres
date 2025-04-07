@@ -1,8 +1,12 @@
 package edu.vanier.template.controllers;
 
+import edu.vanier.template.sim.Planet;
 import edu.vanier.template.ui.MainApp;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -34,12 +38,14 @@ public class TemplateSelectionController {
     @FXML
     ImageView solarSystemImage;
 
+    private SimulationMainPageController simulationMainPageController;
+
     @FXML
     public void initialize() {
         logger.info("Initializing MainAppController...");
         btnTemplateSelection.setOnAction(this::loadVoidPage);
         btnTemplateSelection2.setOnAction(this::loadPrimaryScene);
-        btnTemplateSelection3.setOnAction(this::loadPrimaryScene);
+        btnTemplateSelection3.setOnAction(this::loadSolarSystem);
         returnToStart.setOnAction(this::handleReturnToStartButton);
         initializeBinding();
     }
@@ -51,10 +57,26 @@ public class TemplateSelectionController {
     }
     private void loadVoidPage(Event e) {
        // MainApp.switchScene(MainApp.VOID_SIMULATION_LAYOUT);
-        MainApp.switchScene(MainApp.SIMULATIONS_LAYOUT);
+        MainApp.switchScene(MainApp.SIMULATION_MAIN_PAGE_LAYOUT);
         logger.info("Loaded the void page scene...");
     }
 
+
+    private void loadSolarSystem(Event e) {
+
+        // Switch to the simulation scene
+        MainApp.switchScene(MainApp.SIMULATION_MAIN_PAGE_LAYOUT);
+
+        // Use Platform.runLater to ensure controller is created
+        Platform.runLater(() -> {
+            SimulationMainPageController controller = SimulationMainPageController.getLastInstance();
+            if (controller != null) {
+                controller.loadTemplate("solarSystem");
+            } else {
+                System.err.println("Failed to get simulation controller");
+            }
+        });
+    }
     private void handleReturnToStartButton(Event e) {
         MainApp.switchScene(MainApp.START_SCENE);
     }

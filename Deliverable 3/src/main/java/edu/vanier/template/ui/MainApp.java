@@ -30,9 +30,10 @@ public class MainApp extends Application {
     //declare the FXML file for the void scene
     public static final String VOID_SIMULATION_LAYOUT = "VoidSimulation_layout";
     //declare the FXML file for the planet creation scene
-    public static final String CREATE_PLANET_LAYOUT = "CreatePlanet_layout";
+    public static final String CREATE_PLANET_LAYOUT = "planetCreation_layout";
 
     public static  final String SIMULATIONS_LAYOUT = "Simulations_layout";
+    public static final String SIMULATION_MAIN_PAGE_LAYOUT = "SimulationMainPage_layout";
 
     private final static Logger logger = LoggerFactory.getLogger(MainApp.class);
     private static Scene scene;
@@ -123,6 +124,13 @@ public class MainApp extends Application {
                     SimulationsController controller = new SimulationsController();
                     Parent root = FxUIHelper.loadFXML(fxmlFileName, controller);
                     sceneController.addScene(SIMULATIONS_LAYOUT, root);
+                }
+                sceneController.activateScene(fxmlFileName);
+            } else if (fxmlFileName.equals(SIMULATION_MAIN_PAGE_LAYOUT)) {
+                if(!sceneController.sceneExists(SIMULATION_MAIN_PAGE_LAYOUT)){
+                    SimulationMainPageController controller = new SimulationMainPageController();
+                    Parent root = FxUIHelper.loadFXML(fxmlFileName, controller);
+                    sceneController.addScene(SIMULATION_MAIN_PAGE_LAYOUT, root);
                 }
                 sceneController.activateScene(fxmlFileName);
             }
