@@ -10,7 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape3D;
 
+/**
+ * @author Josue
+ */
 public class BuildInBodies {
     private Body body;
 
@@ -52,14 +56,22 @@ public class BuildInBodies {
     public void setTextures() {
         // Earth texture
         // Image image = new Image(getClass().getResource("/BuildInBodiesImages/EarthImage.jpeg").toExternalForm());
-        Image imageEarth = new Image("/fxml/BuildInBodiesImages/EarthImage.jpeg");
-        Image imageMars = new Image("/fxml/BuildInBodiesImages/MarsImage.png");
-        Image imageJupiter = new Image("/fxml/BuildInBodiesImages/JupiterImage.jpg");
-        Image imageUranus = new Image("/fxml/BuildInBodiesImages/UranusImage.png");
-        Image imageVenus = new Image("/fxml/BuildInBodiesImages/VenusImage.png");
-        Image imageSun = new Image("/fxml/BuildInBodiesImages/SolarImage.jpg");
-        Image imageMercury = new Image("/fxml/BuildInBodiesImages/MercuryImage.png");
+        Image imageEarth = new Image("/fxml/BuildInBodiesImages/EarthImage.jpeg",256,256,true,true);
+        Image imageMars = new Image("/fxml/BuildInBodiesImages/MarsImage.png",256,256,true,true);
+        Image imageJupiter = new Image("/fxml/BuildInBodiesImages/JupiterImage.jpg",256,256,true,true);
+        Image imageUranus = new Image("/fxml/BuildInBodiesImages/UranusImage.png",256,256,true,true);
+        Image imageVenus = new Image("/fxml/BuildInBodiesImages/VenusImage.png",256,256,true,true);
+        Image imageSun = new Image("/fxml/BuildInBodiesImages/SolarImage.jpg",256,256,true,true);
+        Image imageMercury = new Image("/fxml/BuildInBodiesImages/MercuryImage.jpg",256,256,true,true);
+        Image imageNeptune = new Image("/fxml/BuildInBodiesImages/NeptuneImage.jpg",256,256,true,true);
+        Image imageSaturn = new Image("/fxml/BuildInBodiesImages/SaturnImage.jpg",256,256,true,true);
+        Image imagePluto= new Image("/fxml/BuildInBodiesImages/PlutoImage.jpg",256,256,true,true);
 
+        //Moons
+        Image imageMoon = new Image("/fxml/BuildInBodiesImages/MoonImage.jpg",256,256,true,true);
+
+        //Black hole:
+        Image imageBlackHole = new Image("/fxml/BuildInBodiesImages/BlackHoleImage.jpg",256,256,true,true);
         bodyBuildTexture.put("Earth", imageEarth);
         bodyBuildTexture.put("Mars", imageMars);
         bodyBuildTexture.put("Jupiter", imageJupiter);
@@ -67,11 +79,22 @@ public class BuildInBodies {
         bodyBuildTexture.put("Venus", imageVenus);
         bodyBuildTexture.put("Sun", imageSun);
         bodyBuildTexture.put("Mercury", imageMercury);
+        bodyBuildTexture.put("Neptune", imageNeptune);
+        bodyBuildTexture.put("Saturn", imageSaturn);
+        bodyBuildTexture.put("Pluto", imagePluto);
+
+        //Moons
+        bodyBuildTexture.put("Moon", imageMoon);
+
+
+        //Black hole
+        bodyBuildTexture.put("BlackHole", imageBlackHole);
+
 
 
     }
 
-    public static void applyTextures(Body planet, String textureName) {
+    public static void applyTextures(Shape3D planet, String textureName) {
         PhongMaterial material = new PhongMaterial();
 
         if (textureName != null && bodyBuildTexture.containsKey(textureName)) {
@@ -84,7 +107,7 @@ public class BuildInBodies {
 
             // Set appropriate specular power and color based on planet type
             if ("Sun".equals(textureName)) {
-                material.setSpecularPower(100);
+                material.setSpecularPower(1000);
                 material.setSpecularColor(Color.WHITE);
             } else {
                 material.setSpecularPower(30);

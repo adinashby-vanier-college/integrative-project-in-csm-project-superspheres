@@ -34,6 +34,11 @@ dependencies {
     compileOnly  "org.openjfx:javafx-fxml:$javafxVersion:javadoc"
     compileOnly  "org.openjfx:javafx-graphics:$javafxVersion:javadoc"
 
+    implementation(localGroovy())
+    testImplementation(platform('org.junit:junit-bom:5.12.2'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+
     // Link Logback to the project: @see: https://logback.qos.ch/ 
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "ch.qos.logback:logback-core:$logbackVersion"
@@ -45,7 +50,15 @@ dependencies {
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: '12.3.1'    
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
 
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    implementation("com.opencsv:opencsv:3.7")
+}
 
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -53,6 +66,9 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(22)
     }
+
+    sourceCompatibility = JavaVersion.VERSION_22 // Or your desired Java version
+    targetCompatibility = JavaVersion.VERSION_22
 }
 application {       
    // TODO: Specify the fully-qualified name of the class 

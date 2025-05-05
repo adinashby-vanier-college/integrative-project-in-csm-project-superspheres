@@ -7,14 +7,12 @@ package edu.vanier.template.math;
 import edu.vanier.template.sim.Body;
 
 /**
- *
- * @author letua
+ * Handle Gravitational physics applied onto the body
+ * @author Le Tuan Huy Nguyen
  */
 public class Physics {
     
     public static final double G = 9.8;
-
-
     
     /**
      * Calculates the force applied onto the target body by the current body.

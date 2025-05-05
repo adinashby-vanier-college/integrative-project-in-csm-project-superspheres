@@ -44,7 +44,7 @@ public class TemplateSelectionController {
     public void initialize() {
         logger.info("Initializing MainAppController...");
         btnTemplateSelection.setOnAction(this::loadVoidPage);
-        btnTemplateSelection2.setOnAction(this::loadPrimaryScene);
+        btnTemplateSelection2.setOnAction(this::loadAsteroidBelt);
         btnTemplateSelection3.setOnAction(this::loadSolarSystem);
         returnToStart.setOnAction(this::handleReturnToStartButton);
         initializeBinding();
@@ -68,10 +68,27 @@ public class TemplateSelectionController {
         MainApp.switchScene(MainApp.SIMULATION_MAIN_PAGE_LAYOUT);
 
         // Use Platform.runLater to ensure controller is created
+       Platform.runLater(() -> {
+            SimulationMainPageController controller = SimulationMainPageController.getLastInstance();
+            if (controller != null) {
+                logger.info("Loading solar sytem from template");
+                controller.getGroupRootNode().getChildren().clear();
+                controller.loadTemplate("solarSystem");
+            } else {
+                System.err.println("Failed to get simulation controller");
+            }
+        });
+    }
+    private void loadAsteroidBelt(Event e){
+        MainApp.switchScene(MainApp.SIMULATION_MAIN_PAGE_LAYOUT);
+
+        // Use Platform.runLater to ensure controller is created
         Platform.runLater(() -> {
             SimulationMainPageController controller = SimulationMainPageController.getLastInstance();
             if (controller != null) {
-                controller.loadTemplate("solarSystem");
+                logger.info("Loading asteroid belt");
+                controller.getGroupRootNode().getChildren().clear();
+                controller.loadTemplate("asteroidBelt");
             } else {
                 System.err.println("Failed to get simulation controller");
             }
@@ -90,11 +107,11 @@ public class TemplateSelectionController {
         solarSystemImage.fitHeightProperty().bind(borderPane.heightProperty().multiply(0.4));
 
 
-        btnTemplateSelection.prefWidthProperty().bind(emptySystemImage.fitWidthProperty());
-        btnTemplateSelection2.prefWidthProperty().bind(asteroidSystemImage.fitWidthProperty());
-        btnTemplateSelection3.prefWidthProperty().bind(solarSystemImage.fitWidthProperty());
-        btnTemplateSelection.prefHeightProperty().bind(emptySystemImage.fitHeightProperty());
-        btnTemplateSelection2.prefHeightProperty().bind(asteroidSystemImage.fitHeightProperty());
-        btnTemplateSelection3.prefHeightProperty().bind(solarSystemImage.fitHeightProperty());
+        btnTemplateSelection.prefWidthProperty().bind(emptySystemImage.fitWidthProperty().multiply(1.1));
+        btnTemplateSelection2.prefWidthProperty().bind(asteroidSystemImage.fitWidthProperty().multiply(1.1));
+        btnTemplateSelection3.prefWidthProperty().bind(solarSystemImage.fitWidthProperty().multiply(1.1));
+        btnTemplateSelection.prefHeightProperty().bind(emptySystemImage.fitHeightProperty().multiply(1.1));
+        btnTemplateSelection2.prefHeightProperty().bind(asteroidSystemImage.fitHeightProperty().multiply(1.1));
+        btnTemplateSelection3.prefHeightProperty().bind(solarSystemImage.fitHeightProperty().multiply(1.1));
     }
 }

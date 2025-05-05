@@ -13,25 +13,20 @@
 
 <AnchorPane fx:id="rootAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #171717;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox fx:id="hBox" alignment="CENTER_LEFT" layoutY="62.0" prefHeight="369.0" prefWidth="803.0" spacing="60.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="62.0">
-         <padding>
-            <Insets left="20.0" right="20.0" top="10.0" />
-         </padding>
-      </HBox>
-      <Label alignment="CENTER" layoutX="248.0" layoutY="14.0" prefWidth="307.0" text="Customization Page" textFill="WHITE" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="247.33333333333337" AnchorPane.topAnchor="14.0">
-         <font>
-            <Font name="Avenir Heavy" size="20.0" />
-         </font>
-      </Label>
-      <HBox alignment="CENTER" layoutX="384.0" layoutY="62.0" prefHeight="369.0" prefWidth="417.0" AnchorPane.bottomAnchor="76.0" AnchorPane.leftAnchor="384.00000000000006" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="62.0">
+      <HBox alignment="CENTER" layoutX="441.0" layoutY="-2.0" prefHeight="665.0" prefWidth="398.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="441.0" AnchorPane.rightAnchor="-5.684341886080802E-14" AnchorPane.topAnchor="0.0">
          <children>
-            <Sphere fx:id="textureBodySphere" radius="30.0" />
+            <Sphere fx:id="textureBodySphere" radius="32.0" />
          </children>
       </HBox>
-      <HBox layoutY="62.0" prefHeight="389.0" prefWidth="417.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.684341886080802E-14" AnchorPane.rightAnchor="386.00000000000006" AnchorPane.topAnchor="62.0">
+      <HBox prefHeight="477.0" prefWidth="417.0" AnchorPane.bottomAnchor="39.99999999999994" AnchorPane.leftAnchor="5.684341886080802E-14" AnchorPane.rightAnchor="386.00000000000006" AnchorPane.topAnchor="0.0">
          <children>
-            <VBox alignment="CENTER_LEFT" prefHeight="369.0" prefWidth="417.0" spacing="10.0">
+            <VBox alignment="CENTER" prefHeight="369.0" prefWidth="398.0" spacing="10.0">
                <children>
+                  <Label alignment="CENTER" prefWidth="307.0" text="Customization Page" textFill="WHITE">
+                     <font>
+                        <Font name="Avenir Heavy" size="20.0" />
+                     </font>
+                  </Label>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Button fx:id="starButton" minWidth="53.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="70.0" style="-fx-background-color: white;" text="Star">
@@ -62,10 +57,10 @@
                            <children>
                               <Label text="Radius:" textFill="WHITE">
                                  <font>
-                                    <Font name="System Bold Italic" size="14.0" />
+                                    <Font name="System Bold" size="14.0" />
                                  </font>
                               </Label>
-                              <Slider fx:id="radiusSlider" majorTickUnit="100.0" max="600.0" min="10.0" minorTickCount="4" prefHeight="38.0" prefWidth="415.0" showTickLabels="true" showTickMarks="true" />
+                              <Slider fx:id="radiusSlider" majorTickUnit="100.0" max="200.0" min="10.0" minorTickCount="4" prefHeight="38.0" prefWidth="415.0" showTickLabels="true" showTickMarks="true" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
@@ -75,12 +70,12 @@
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                               </Label>
-                              <Slider fx:id="massSlider" blockIncrement="5.0" majorTickUnit="100.0" max="1500.0" min="10.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" />
+                              <Slider fx:id="massSlider" blockIncrement="5.0" majorTickUnit="100.0" max="500.0" min="10.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" />
                               <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                                  <children>
                                     <Label text="Appearance:" textFill="WHITE">
                                        <font>
-                                          <Font name="Avenir Black Oblique" size="14.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
                                     <ComboBox fx:id="bodyTextureComboBox" prefWidth="150.0" promptText="Body Texture" style="-fx-background-color: white;" />
@@ -102,7 +97,7 @@
       </HBox>
       <Button fx:id="button" layoutX="683.0" layoutY="517.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="70.0" style="-fx-background-color: #333333; -fx-background-radius: 10;" text="Create" textFill="WHITE" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="67.0">
          <font>
-            <Font name="Avenir Next Condensed Heavy Italic" size="13.0" />
+            <Font name="Dubai Bold" size="13.0" />
          </font></Button>
    </children>
    <padding>

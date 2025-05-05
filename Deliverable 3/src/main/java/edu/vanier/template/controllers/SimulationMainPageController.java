@@ -5,30 +5,27 @@ import edu.vanier.template.math.Vector3D;
 import edu.vanier.template.sim.BodyHandler;
 import edu.vanier.template.sim.CameraControlsHandler;
 import edu.vanier.template.sim.Planet;
-import edu.vanier.template.helpers.SavenLoad;
 
 import edu.vanier.template.sim.SolarSystemAssets;
 import edu.vanier.template.ui.MainApp;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -36,6 +33,7 @@ import static edu.vanier.template.helpers.SavenLoad.loadFileSaver;
 import static edu.vanier.template.helpers.SavenLoad.writePlanetsToFile;
 
 public class SimulationMainPageController {
+    private final static Logger logger = LoggerFactory.getLogger(SimulationMainPageController.class);
 
     // All the main containers:
     @FXML
@@ -60,8 +58,6 @@ public class SimulationMainPageController {
     @FXML
     private TilePane tilePanePlanets;
     @FXML
-    private VBox vBoxCustomizeButton;
-    @FXML
     private Button buttonCustomizePlanet;
 
     @FXML
@@ -69,11 +65,10 @@ public class SimulationMainPageController {
     //Components(Essential):
     @FXML
     private Button buttonCamera;
-
     @FXML
-    private Button buttonExit;
+    private Button buttonSimulationSpeed;
     @FXML
-    private VBox vboxExitButton;
+    private VBox vboxSimulationSpeed;
 
     @FXML
     private Button buttonSettings;
@@ -81,8 +76,6 @@ public class SimulationMainPageController {
     private VBox vboxSetting;
     @FXML
     private VBox vboxSettingButton;
-    @FXML
-    private AnchorPane anchorPaneSetting;
     @FXML
     private Button buttonSettingExit;
     @FXML
@@ -106,7 +99,6 @@ public class SimulationMainPageController {
     private Button buttonSetBackOrigin;
     @FXML
     private TextField textFieldCameraSpeed;
-
     //Subscene simulation
     @FXML
     private SubScene subSceneSimulation;
@@ -115,18 +107,31 @@ public class SimulationMainPageController {
     private Slider simulationSpeedSlider;
     @FXML
     private TextField textFieldVelocity;
-    
+    @FXML
+    private VBox vboxInputVelocity;
+    @FXML
+    private  Button buttonSimulatedBodies;
+    @FXML
+    private VBox vBoxSimulatedBodies;
+    @FXML
+    public  ListView<HBox> listViewSimulatedBodies;
+    @FXML
+    private Button buttonPause;
+    @FXML
+    private Button buttonPlay;
+
+
     //Non fxml field members:
     private Group groupRootNode = new Group();
     
     private PerspectiveCamera camera = new PerspectiveCamera(true);
-    private CameraControlsHandler cameraControlsHandler;
+    public CameraControlsHandler cameraControlsHandler;
     
     private AnimationTimer animationTimer;
     private long prevTime = System.nanoTime();
+    private long prevTimeRotation = System.nanoTime();
 
     private BodyHandler bodyHandler;
-    private DragAndDropSystem dragAndDropSystem ;
     private SolarSystemAssets solarSystemAssets;
     private GarbageCollector garbageCollector;
 
@@ -135,29 +140,44 @@ public class SimulationMainPageController {
         currentInstance = this;
     }
     public  static SimulationMainPageController getLastInstance(){return currentInstance;}
-
+    public PerspectiveCamera getCamera(){return this.camera;}
+    public Group getGroupRootNode(){return  this.groupRootNode;}
+    public BodyHandler getBodyHandler(){return this.bodyHandler;}
     public void loadTemplate(String templateName){
+        pauseSimulation();
         if(garbageCollector == null){
             garbageCollector = new GarbageCollector(groupRootNode, bodyHandler);
         }
+        groupRootNode.getChildren().clear();
+        RotationClass.clearAllRotations();
+        bodyHandler.getBodies().clear();
         garbageCollector.clearAll();
+
 
         switch (templateName){
             case "empty":
                 //nothing cuz its empty
             case "solarSystem":
                 if(solarSystemAssets == null){
+
                     solarSystemAssets =  new SolarSystemAssets();
                 }
                 solarSystemAssets.loadAssets(groupRootNode,bodyHandler);
                 break;
+            case "asteroidBelt":
 
+                    if(solarSystemAssets == null){
+                        solarSystemAssets =  new SolarSystemAssets();
+                    }
+                    solarSystemAssets.loadAsteroidBelts(groupRootNode,bodyHandler);
+                    break;
         }
+        unPauseSimulation();
     }
     double count = 1.0;
     double count2 = 1.0;
-    
-    double timeConstant = 1;
+
+    double timeConstant = 10;
 
     public void handlerButtonSetting() {
         if (vboxSetting.isVisible()) {
@@ -168,7 +188,7 @@ public class SimulationMainPageController {
         }else {
             // animations can be added here
             vboxSetting.setVisible(true);
-            buttonSettingSave.setManaged(true);
+            if (buttonSettingSave != null)buttonSettingSave.setManaged(true);
             buttonSettingExit.setManaged(true);
             buttonSettingLoad.setManaged(true);
         }
@@ -188,6 +208,17 @@ public class SimulationMainPageController {
 
     //add event to exit button
     public  void handleExitButton(){
+        groupRootNode.getChildren().clear();
+        bodyHandler.getBodies().clear();
+        vboxSetting.setVisible(false);
+        vboxSetting.setManaged(false);
+        this.vboxCameraControls.setVisible(false);
+        this.vboxCameraControls.setManaged(false);
+        this.vboxSimulationSpeed.setVisible(false);
+        this.vboxSimulationSpeed.setManaged(false);
+        tiltPanePlanets.setExpanded(false);
+        vBoxSimulatedBodies.setVisible(false);
+
         MainApp.switchScene(MainApp.TEMPLATE_SELECTION_LAYOUT);
     }
     public  void handleSelectionButton(){
@@ -219,11 +250,28 @@ public class SimulationMainPageController {
             if (!this.vboxCameraControls.isVisible()) {
                 this.vboxCameraControls.setVisible(true);
                 this.vboxCameraControls.setManaged(true);
+                this.vboxSimulationSpeed.setVisible(false);
+                this.vboxSimulationSpeed.setManaged(false);
             } else {
                 this.vboxCameraControls.setVisible(false);
                 this.vboxCameraControls.setManaged(false);
             }
 
+        });
+    }
+
+    public void handlerSimulationSpeedButtonEvent() {
+        //animations logic to be added
+        this.buttonSimulationSpeed.setOnAction(e -> {
+            if (!this.vboxSimulationSpeed.isVisible()) {
+                this.vboxSimulationSpeed.setVisible(true);
+                this.vboxSimulationSpeed.setManaged(true);
+                this.vboxCameraControls.setVisible(false);
+                this.vboxCameraControls.setManaged(false);
+            } else {
+                this.vboxSimulationSpeed.setVisible(false);
+                this.vboxSimulationSpeed.setManaged(false);
+            }
         });
     }
 
@@ -278,10 +326,12 @@ public class SimulationMainPageController {
         simulationSpeedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             timeConstant = newVal.doubleValue();
         });
+        tilePanePlanets.setHgap(5);
+        tilePanePlanets.setVgap(5);
+        tilePanePlanets.setPadding(new Insets(5));
 
     }
     public void handlerSaveButtonEvent(){
-
         try {
             // Write to file
             writePlanetsToFile(bodyHandler.getBodies(), "src/main/resources/planets.txt");
@@ -295,12 +345,8 @@ public class SimulationMainPageController {
     }
 
     public void handleCamera() {
-        Box box = new Box(25, 25, 20);
-        box.setMaterial(new PhongMaterial(Color.RED));
-        groupRootNode.getChildren().add(box);
-
         this.camera.setTranslateZ(-1000);
-        this.camera.setFarClip(100000);
+        this.camera.setFarClip(2000000000);
         this.camera.setNearClip(0.1);
 
         this.subSceneSimulation.setRoot(groupRootNode);
@@ -326,24 +372,38 @@ public class SimulationMainPageController {
             public void handle(long now) {
                 double dt = (now - prevTime) / 1E9;
                 cameraControlsHandler.updateMovement(dt);
-                RotationClass.updateAllRotations(dt);
                 bodyHandler.update(dt * timeConstant);
                 prevTime = now;
+
+                // if some see th
+                //if(true){
+                    bodyHandler.getBodies().forEach(body -> {
+                        body.updateLabelPosition();
+                    });
+                //}
             }
         };
+    }
+
+    public void pauseSimulation() {
+        animationTimer.stop();
+    }
+
+    public void unPauseSimulation() {
+        prevTime = System.nanoTime();
+        animationTimer.start();
     }
 
     public void setupBodies(){
         bodyHandler = new BodyHandler();
 
-        dragAndDropSystem = new DragAndDropSystem(tilePanePlanets,this.groupRootNode,this.subSceneSimulation, cameraControlsHandler,hboxRootToolBar, textFieldVelocity,bodyHandler);
+        DragAndDropSystem dragAndDropSystem = new DragAndDropSystem(tilePanePlanets, this.groupRootNode, this.subSceneSimulation, cameraControlsHandler, hboxRootToolBar, textFieldVelocity, vboxInputVelocity, bodyHandler);
         dragAndDropSystem.DragAndDropHandler();
 
         Planet planet = new Planet(new Vector3D(-650 , 0, .01), new Vector3D(0, 0, -12.28), 100.0, 10);
 
         Planet planet2 = new Planet(new Vector3D(0  , 0, 0), new Vector3D(0,0,0),10000, 170);
 
-        Planet planet3 = new Planet(new Vector3D(0  , 0, 0), new Vector3D(0,0,0),150, 170);
         Rotate yRotate = new Rotate(0, Rotate.Y_AXIS);
         Rotate yRotate2 = new Rotate(0, Rotate.Y_AXIS)
                 ;
@@ -353,32 +413,28 @@ public class SimulationMainPageController {
 AnimationTimer animationTimer1 = new AnimationTimer() {
     @Override
     public void handle(long now) {
+        double dt = (now - prevTimeRotation) / 1E9;
+        RotationClass.updateAllRotations(dt);
+
         count += 10;
         count2 += 0.05;
         yRotate.setAngle(count);
         yRotate2.setAngle(count2);
 
+        prevTimeRotation = now;
         if (count >= 360 ) count = 0;
     }
 };
 animationTimer1.start();
 
         BuildInBodies buildInBodies = new BuildInBodies(planet);
-        BuildInBodies buildInBodies1 = new BuildInBodies(planet2);
-
-        buildInBodies.applyTextures("Mercury");
-        buildInBodies1.applyTextures("Sun");
+//        BuildInBodies buildInBodies1 = new BuildInBodies(planet2);
       //  buildInBodies2.applyTextures("Sun");
-
-        groupRootNode.getChildren().add(planet);
-        groupRootNode.getChildren().add(planet2);
-
-
-
-       bodyHandler.add(planet);
-        bodyHandler.add(planet2);
-
+      
+      planet.removeBody();
+      planet2.removeBody();
     }
+    
     public void spawnPlanet(double x1,double y1, double z1,double x2,double y2, double z2, int mass, int size,int angle, String texture){
 
         Planet planet = new Planet(new Vector3D(x1 , y1, z1), new Vector3D(x2, y2, x2), mass, size);
@@ -398,101 +454,75 @@ animationTimer1.start();
         };
         animationTimer1.start();
         BuildInBodies buildInBodies = new BuildInBodies(planet);
+
         buildInBodies.applyTextures(texture);
         groupRootNode.getChildren().add(planet);
         bodyHandler.add(planet);
-
     }
-
-    public void handleCreationButton() {
-        MainApp.switchScene(MainApp.CREATE_PLANET_LAYOUT);
-        spawnPlanet(650, 0, .01, 0, 0, 12.28, 100, 10, 0, "earth");
-        System.out.println(cameraControlsHandler.getPrevMovementVector());
-    }
-
 
     public void setTilePanePlanets(){
         tilePanePlanets.setPickOnBounds(false);
     }
     @FXML
     public void initialize() {
-
-        Planet mercury = new Planet(
-                new Vector3D(-800-600, 0, 0),
-                new Vector3D(0, 0, 0),
-                10,    // Mass
-                20     // Size
-        );
-
-
-        // Venus
-        Planet venus = new Planet(
-                new Vector3D(-1200-600, 0, 0),
-                new Vector3D(0, 0, 0),
-                20,    // Mass
-                40     // Size
-        );
-
-        // Earth
-        Planet earth = new Planet(
-                new Vector3D(-1600-600, 0, 0),
-                new Vector3D(0, 0, 0),
-                20,    // Mass
-                42     // Size
-        );
-        BuildInBodies buildInBodies = new BuildInBodies(mercury);
-        BuildInBodies buildInBodies1 = new BuildInBodies(venus);
-        BuildInBodies buildInBodies2 = new BuildInBodies(earth);
-
-        buildInBodies.applyTextures("Mercury");
-        buildInBodies1.applyTextures("Venus");
-        buildInBodies2.applyTextures("Earth");
-
-        tilePanePlanets.getChildren().addAll(earth,mercury,venus);
-
-
         groupRootNode.setDepthTest(DepthTest.ENABLE);
-
         vboxSettingButton.setLayoutX(200);
+        simulationSpeedSlider.setValue(10);
 
-        //make sure that the setting button sticks to the top right corner
-        AnchorPane.setTopAnchor(vboxSettingButton, 20.0);     // Stick to top
-        AnchorPane.setRightAnchor(vboxSettingButton, 20.0);   // Stick to right
-        AnchorPane.setTopAnchor(vboxSetting, 20.0);     // Stick to top
-        AnchorPane.setRightAnchor(vboxSetting, 40.0);   // Stick to right
 
 
         // Button events
         this.buttonAddPlanet.setOnAction(e -> {
             handlerButtonAddPlanetEvent();
         });
-
-        buttonExit.setOnAction(event -> handleExitButton());
+        buttonPause.setOnAction(event -> pauseSimulation());
+        buttonPlay.setOnAction(event -> unPauseSimulation());
         buttonSettings.setOnAction(event -> handlerButtonSetting());
-        //buttonCustomizePlanet.setOnAction(event -> handleCreationButton());
         buttonSettingExit.setOnAction(event -> handleExitButton());
+        buttonSimulatedBodies.setOnAction(event -> {handleButtonSimulatedBodies();});
+        buttonSetBackOrigin.setOnAction(event -> cameraControlsHandler.reset());
 
-        buttonSettingSave.setOnAction(event -> handlerSaveButtonEvent());
+        buttonSettingSave.setOnAction(event -> {
+            System.out.println("save soon");
+            handlerSaveButtonEvent();
+        });
         buttonSettingLoad.setOnAction(event -> {
             try {
+                garbageCollector.clearAll();
                 HandlerSettingLoad();
+                pauseSimulation();
+                unPauseSimulation();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
+
         //Handler
         handlerCameraButtonEvent();
-        handlePlanetCreationButtonEvent();
+        handlerSimulationSpeedButtonEvent();
         initializeBinding();
         setSubSceneSimulation();
         handlerTitlePaneEvent();
         handleCamera();
-
-
+        handlePlanetCreationButtonEvent();
 
         setupBodies();
+        //Initalize scale :
+
         setupAnimationTimer();
         animationTimer.start();
+    }
+
+    public  void handleButtonSimulatedBodies(){
+        logger.info("Make vbox visible");
+        if(!vBoxSimulatedBodies.isVisible()) {
+            vBoxSimulatedBodies.setVisible(true);
+            vBoxSimulatedBodies.setManaged(true);
+        }else {
+            vBoxSimulatedBodies.setVisible(false);
+            vBoxSimulatedBodies.setManaged(false);
+        }
+
     }
 
     public void handlePlanetCreationButtonEvent() {
@@ -501,6 +531,7 @@ animationTimer1.start();
 
         buttonCustomizePlanet.setOnAction(event -> {
             try {
+                pauseSimulation();
                 Parent root = FxUIHelper.loadFXML("planetCreation_layout", createPlanetController);
 
                 Scene currentScene = buttonCustomizePlanet.getScene();
@@ -508,15 +539,15 @@ animationTimer1.start();
                 double height = currentScene.getHeight();
 
                 Scene scene = new Scene(root, width, height);
-                Stage stage = new Stage();
-                stage.setTitle("Planet Creation");
-                stage.setScene(scene);
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.initOwner(buttonCustomizePlanet.getScene().getWindow());
-                stage.showAndWait();
+                Stage planetCreationStage = new Stage();
+                planetCreationStage.setTitle("Planet Creation");
+                planetCreationStage.setScene(scene);
+                planetCreationStage.initModality(Modality.APPLICATION_MODAL);
+                planetCreationStage.initOwner(buttonCustomizePlanet.getScene().getWindow());
+                planetCreationStage.setOnHidden(e -> unPauseSimulation());
+                planetCreationStage.showAndWait();
             } catch (Exception e) {
                 System.out.println("AAAAAAAAA");
-                e.getMessage();
             }
         });
     }

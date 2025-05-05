@@ -1,5 +1,6 @@
 package edu.vanier.template.controllers;
 
+import edu.vanier.template.helpers.ScalePlanet;
 import edu.vanier.template.ui.MainApp;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -27,10 +28,12 @@ public class SimulationsController {
         subScene = new SubScene(groupRoot,800,600);
         subScene.setFill(Color.BLACK);
         stackPaneNode.getChildren().add(subScene);
-        buttonAddPlanet.setOnAction(event -> {handleStartButton();});
+
+        buttonAddPlanet.setOnAction(event -> {
+            handleAddPlanetButton();});
         initializeBinding();
     }
-    public  void handleStartButton(){
+    public  void handleAddPlanetButton(){
         MainApp.switchScene(MainApp.CREATE_PLANET_LAYOUT);
     }
     public  void initializeBinding(){

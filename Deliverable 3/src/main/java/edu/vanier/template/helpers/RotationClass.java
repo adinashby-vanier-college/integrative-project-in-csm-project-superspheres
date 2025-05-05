@@ -38,4 +38,7 @@ public class RotationClass {
             this.rotationRate = rotationRate;
         }
     }
+    public static void clearAllRotations(){
+        rotatingBodies.clear();
+    }
 }

@@ -13,6 +13,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape3D;
@@ -35,18 +36,20 @@ public class DragAndDropSystem {
     private double setBackX, setBackY;
     private SubScene subScene;
     private javafx.scene.control.TextField textFieldVelocity;
+    private VBox vboxInputVelocity;
     private BodyHandler bodyHandler;
     private  boolean isDraggable = true;
     private  CameraControlsHandler cameraControlsHandler;
     private Vector3D vector3DInitialPosition;
     private  RayCaster rayCaster;
-    public  DragAndDropSystem(TilePane tilePane, Group targetGroup, SubScene subScene, CameraControlsHandler cameraControlsHandler, HBox toolBar, TextField textField , BodyHandler bodyHandler){
+    public  DragAndDropSystem(TilePane tilePane, Group targetGroup, SubScene subScene, CameraControlsHandler cameraControlsHandler, HBox toolBar, TextField textField , VBox vboxInputVelocity, BodyHandler bodyHandler){
         this.tilePane = tilePane;
         this.targetGroup = targetGroup;
         this.hBoxToolBar = toolBar;
         this.cameraControlsHandler = cameraControlsHandler;
         this.subScene = subScene;
         this.textFieldVelocity  = textField;
+        this.vboxInputVelocity = vboxInputVelocity;
         this.bodyHandler = bodyHandler;
         this.rayCaster = new RayCaster(targetGroup, cameraControlsHandler);
 
@@ -88,6 +91,7 @@ public class DragAndDropSystem {
 
     public void transferToSimulation(){
         if(draggedObject != null && cameraControlsHandler != null){
+            ScalePlanet.prepareForSimulation(draggedObject);
             this.targetGroup.getChildren().add(draggedObject);
             this.putObjectInFrontOfCamera(draggedObject,500);
             Body cloneDragged = draggedObject;
@@ -129,9 +133,10 @@ public class DragAndDropSystem {
     }
     public void DropHandler(Body draggedObject1){
         if(this.bodyHandler == null) return;
-            textFieldVelocity.setVisible(true);
-            textFieldVelocity.setManaged(true);
-
+        vboxInputVelocity.setVisible(true);
+        vboxInputVelocity.setManaged(true);
+        textFieldVelocity.setVisible(true);
+        textFieldVelocity.setManaged(true);
 
 
             //Find central body if looking at 1
@@ -159,6 +164,10 @@ public class DragAndDropSystem {
                         this.textFieldVelocity.setVisible(false);
                         this.textFieldVelocity.setManaged(false);
                         this.textFieldVelocity.setText("0.00");
+                        this.textFieldVelocity.getParent().getParent().requestFocus();
+
+                        this.vboxInputVelocity.setVisible(false);
+                        this.vboxInputVelocity.setManaged(false);
                     }
 
                 }catch (Exception exception){
@@ -170,19 +179,30 @@ public class DragAndDropSystem {
 
     public void putObjectInFrontOfCamera(Shape3D shape3D, double distanceFromCamera) {
         PerspectiveCamera perspectiveCamera = cameraControlsHandler.getCamera();
-        logger.info("camera: x={}, y={}, z={}", perspectiveCamera.getTranslateX(), perspectiveCamera.getTranslateY(), perspectiveCamera.getTranslateZ());
-        Point3D point3DCameraPosition =  targetGroup.sceneToLocal(perspectiveCamera.localToScene(
-                0,0,0
-        ));
+       Point3D point3DCameraPosition = targetGroup.sceneToLocal(perspectiveCamera.localToScene(0, 0, 0));
+       // Point3D point3DCameraPosition = new Point3D(perspectiveCamera.getTranslateX(), perspectiveCamera.getTranslateY(), perspectiveCamera.getTranslateZ());
         Point3D point3DLookVector = cameraControlsHandler.getLookVector();
 
-        Point3D point3DSpawnPosition = point3DCameraPosition.add(point3DLookVector.multiply(distanceFromCamera));
-        if(shape3D != null){
+        // Get the radius if the shape is a Sphere
+        double radius = 0;
+        if (shape3D instanceof Sphere) {
+            radius = ((Sphere)shape3D).getRadius();
+        }
+
+        // Calculate spawn position accounting for object's radius
+        Point3D point3DSpawnPosition = point3DCameraPosition.add(
+                point3DLookVector.multiply(distanceFromCamera).add(radius,-radius,0)
+        );
+
+        if(shape3D != null) {
             shape3D.setTranslateX(point3DSpawnPosition.getX());
             shape3D.setTranslateY(point3DSpawnPosition.getY());
             shape3D.setTranslateZ(point3DSpawnPosition.getZ());
-            vector3DInitialPosition = new Vector3D(shape3D.getTranslateX(), shape3D.getTranslateY(),shape3D.getTranslateZ());
-            logger.info("sphere position x={}, y={}, z={}", shape3D.getTranslateX(), shape3D.getTranslateY(),shape3D.getTranslateZ());
+            vector3DInitialPosition = new Vector3D(
+                    shape3D.getTranslateX(),
+                    shape3D.getTranslateY(),
+                    shape3D.getTranslateZ()
+            );
         }
     }
     public void DragAndDropHandler(){

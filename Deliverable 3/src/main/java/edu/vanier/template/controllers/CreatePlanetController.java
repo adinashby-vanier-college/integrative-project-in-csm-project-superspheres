@@ -2,6 +2,7 @@ package edu.vanier.template.controllers;
 
 import edu.vanier.template.helpers.BuildInBodies;
 import edu.vanier.template.helpers.RotationClass;
+import edu.vanier.template.helpers.ScalePlanet;
 import edu.vanier.template.math.Vector3D;
 import edu.vanier.template.sim.Body;
 import edu.vanier.template.sim.Planet;
@@ -33,8 +34,8 @@ public class CreatePlanetController {
     private Button starButton;
     @FXML
     private Button planetButton;
-    @FXML
-    private boolean isPlanet;
+
+    private boolean isPlanet = true;
     private SimulationMainPageController simulationController;
     @FXML
     private Slider rotationSlider;
@@ -61,14 +62,15 @@ public class CreatePlanetController {
 
         radiusSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (isPlanet) {
-                textureBodySphere.setRadius(newValue.doubleValue()*0.4);
+                textureBodySphere.setRadius(newValue.doubleValue()*0.8);
             } else {
                 textureBodySphere.setRadius(newValue.doubleValue()*0.2);
             }
 
         });
 
-        radiusSlider.setValue(300);
+        radiusSlider.setValue(40);
+        massSlider.setValue(50);
 
         rotationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             rotationClassForBody = new RotationClass();
@@ -110,8 +112,11 @@ public class CreatePlanetController {
                 texturizeBody(new Image("/fxml/BuildInBodiesImages/SolarImage.jpg"), Color.GOLD);
                 break;
             case "Mercury":
-                texturizeBody(new Image("/fxml/BuildInBodiesImages/MercuryImage.png"), Color.DARKGRAY);
+                // example of what to do..
+                BuildInBodies.applyTextures(textureBodySphere,"Mercury");
                 break;
+            case "Saturn":
+                BuildInBodies.applyTextures(textureBodySphere,"Saturn");
             default:
                 break;
         }
@@ -121,6 +126,7 @@ public class CreatePlanetController {
     @FXML
     private void handleCreateButton() {
         button.setOnAction(event -> {
+
                 double mass = massSlider.getValue();
                 double radius = radiusSlider.getValue();
                 //double velocity = rotationSlider.getValue();
@@ -130,15 +136,20 @@ public class CreatePlanetController {
                 if (isPlanet) {
                     body = new Planet(new Vector3D(0, 0, 0), new Vector3D(0, 0, 0), mass, radius);
 
+                    
                     rotationClassForBody.addBody(body, rotationRate);
+//                    body.getTrail().setActive(false);
+//                    body.getTrail().setTrailColor(Color.WHITE);
                 } else {
                     body = new Star(new Vector3D(0, 0, 0), new Vector3D(0, 0, 0), mass, radius);
+                    body.getTrail().setActive(false);
                     rotationClassForBody.addBody(body, rotationRate);
                 }
                 BuildInBodies buildInBodies = new BuildInBodies(body);
                 buildInBodies.applyTextures(bodyTexture);
+                ScalePlanet.prepareForTilePane(body);
                 simulationController.getTilePanePlanets().getChildren().add(body);
-
+                isPlanet = true;
                 button.getScene().getWindow().hide();
         });
     }
@@ -158,6 +169,7 @@ public class CreatePlanetController {
            radiusSlider.setMax(1200);
            massSlider.setMin(1500);
            massSlider.setMax(3000);
+           rotationSlider.setValue(1);
        });
     }
 
@@ -174,10 +186,12 @@ public class CreatePlanetController {
             isPlanet = true;
 
             radiusSlider.setMin(10);
-            radiusSlider.setMax(600);
+            radiusSlider.setMax(200);
             massSlider.setMin(10);
-            massSlider.setMax(1500);
-            radiusSlider.setValue(300);
+            massSlider.setMax(500);
+            radiusSlider.setValue(40);
+            massSlider.setValue(50);
+            rotationSlider.setValue(1);
         });
     }
 

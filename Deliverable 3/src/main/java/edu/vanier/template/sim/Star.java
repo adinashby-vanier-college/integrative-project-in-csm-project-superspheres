@@ -4,6 +4,10 @@ import edu.vanier.template.math.Vector3D;
 import javafx.scene.PointLight;
 import javafx.scene.paint.Color;
 
+/**
+ * Star extension of Body, contains a pointLight;
+ * @author Le Tuan Huy Nguyen
+ */
 public class Star extends Body{
     PointLight pointLight = new PointLight(Color.WHITE);
 
@@ -15,6 +19,11 @@ public class Star extends Body{
         super(position, velocity, mass, d);
     }
     
+    /**
+     * Identical to the main Body's update function, except the PointLight is also
+     * moved
+     * @param deltaTime the time since the last frame in seconds
+     */
     public void update(double deltaTime){
         acceleration = force.scaleVector3D(1/mass);
         velocity.addToCurrentVector3D(acceleration.scaleVector3D(deltaTime));

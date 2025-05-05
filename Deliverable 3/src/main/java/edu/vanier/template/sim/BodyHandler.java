@@ -4,6 +4,7 @@
  */
 package edu.vanier.template.sim;
 
+import edu.vanier.template.controllers.SimulationMainPageController;
 import edu.vanier.template.controllers.TemplateSelectionController;
 import edu.vanier.template.math.Physics;
 import edu.vanier.template.math.Vector3D;
@@ -13,8 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- *
- * @author letua
+ * A group of Bodys that can calculate forces applied on one another each frame to
+ * determine movement
+ * @author Le Tuan Huy Nguyen
  */
 public class BodyHandler {
     private final static Logger logger = LoggerFactory.getLogger(BodyHandler.class);
@@ -24,6 +26,10 @@ public class BodyHandler {
         bodies = new ArrayList<>();
     }
 
+    /**
+     * Add forces on bodies depending on other bodies in the BodyHandler
+     * @param deltaTime 
+     */
     public void update(double deltaTime){
 
         for(Body target: bodies){
@@ -46,9 +52,20 @@ public class BodyHandler {
 
     }
 
+    /**
+     * Add a new body
+     * @param body body to be added
+     */
     public void add(Body body){
         bodies.add(body);
+        if(body.nameLabel!= null)
+            SimulationMainPageController.getLastInstance().getGroupRootNode().getChildren().add(body.nameLabel);
     }
+    
+    /**
+     * Add many new bodies
+     * @param bodies bodies to be added
+     */
     public void addAll(Body... bodies){
         for(Body body : bodies){add(body);}
     }
